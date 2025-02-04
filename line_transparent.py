@@ -1,14 +1,15 @@
-from time import sleep
-
 from py5 import *
 import py5
 from random import randint
 
-pg = None
+pg:Py5Graphics = None
 x, y, start = None, None, None
+
+
 def settings():
     size(800, 800)
     pixel_density(2)
+
 
 def setup():
     global pg
@@ -16,7 +17,6 @@ def setup():
     stroke_weight(randint(5, 20))
     stroke(randint(0, 255), randint(0, 255), randint(0, 255))
     pg = create_graphics(800, 800)
-
 
 
 def draw():
@@ -29,11 +29,13 @@ def draw():
     pg.end_draw()
     image(pg, 0, 0)
 
+
 def mouse_pressed():
     global x, y, start
     pg.stroke_weight(randint(5, 20))
     pg.stroke(randint(0, 255), randint(0, 255), randint(0, 255))
     x, y = py5.mouse_x, py5.mouse_y
     start = True
+
 
 run_sketch()
