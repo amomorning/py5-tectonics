@@ -1,5 +1,5 @@
 from py5 import *
-
+from utils import gradient_line
 
 class SimplePendulum:
     def __init__(self, x, y, r, speed, angle=0):
@@ -73,19 +73,6 @@ class CompoundPendulum:
         return self.pendulums[-1].get_end()
 
 
-pendulum:CompoundPendulum = None
-
-def gradient_line(x1, y1, x2, y2, c1, c2, line_segs=100, line_weight=1):
-    stroke_weight(line_weight)
-
-    dx = (x2 - x1) / line_segs
-    dy = (y2 - y1) / line_segs
-
-    for i in range(line_segs):
-        c = lerp_color(c1, c2, i / line_segs)
-        stroke(c)
-        line(x1 + i * dx, y1 + i * dy,
-             x1 + (i + 1) * dx, y1 + (i + 1) * dy)
 
 
 def settings():
@@ -105,9 +92,11 @@ def setup():
 def draw():
     global pendulum
     pendulum.display_path(color(43, 66, 146), color(133, 142, 159))
-    # background(255)
     pendulum.update()
+    # background(255)
     # pendulum.display()
 
 
-run_sketch()
+if __name__ == '__main__':
+    pendulum:CompoundPendulum = None
+    run_sketch()

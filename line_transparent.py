@@ -2,9 +2,6 @@ from py5 import *
 import py5
 from random import randint
 
-pg:Py5Graphics = None
-x, y, start = None, None, None
-
 
 def settings():
     size(800, 800)
@@ -37,5 +34,8 @@ def mouse_pressed():
     x, y = py5.mouse_x, py5.mouse_y
     start = True
 
+if __name__ == '__main__':
+    pg:Py5Graphics = None
+    x, y, start = None, None, None
 
-run_sketch()
+    run_sketch()
