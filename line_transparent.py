@@ -5,7 +5,8 @@ from random import randint
 
 def settings():
     size(800, 800)
-    pixel_density(2)
+    if sys.platform == 'darwin':
+        pixel_density(2)
 
 
 def setup():

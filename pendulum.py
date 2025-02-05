@@ -1,5 +1,6 @@
 from py5 import *
 from utils import gradient_line
+import sys
 
 class SimplePendulum:
     def __init__(self, x, y, r, speed, angle=0):
@@ -77,7 +78,8 @@ class CompoundPendulum:
 
 def settings():
     size(800, 800)
-    pixel_density(2)
+    if sys.platform == 'darwin':
+        pixel_density(2)
 
 
 def setup():
