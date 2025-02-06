@@ -2,16 +2,20 @@ from py5 import *
 from random import randint
 import sys
 
+
+def random_color():
+    return color(randint(0, 255), randint(0, 255), randint(0, 255))
+
+
 def settings():
     size(800, 800, P2D) # P2D is needed for gradient
     if sys.platform == 'darwin':
         pixel_density(2)
 
-def random_color():
-    return color(randint(0, 255), randint(0, 255), randint(0, 255))
 
 def setup():
     background(255)
+
 
 def draw():
     background(255)
@@ -28,6 +32,7 @@ def draw():
 
 def key_pressed():
     print_line_profiler_stats()
+
 
 if __name__ == '__main__':
     profile_draw()

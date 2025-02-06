@@ -34,7 +34,8 @@ def mouse_pressed():
     pg.stroke_weight(randint(5, 20))
     pg.stroke(randint(0, 255), randint(0, 255), randint(0, 255))
     x, y = py5.mouse_x, py5.mouse_y
-    start = True
+    start = not start
+
 
 if __name__ == '__main__':
     pg:Py5Graphics = None
