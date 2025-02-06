@@ -68,9 +68,9 @@ class CompoundPendulum:
             pendulum.update(x, y)
             x, y = pendulum.get_end()
 
-    def display(self, c=color(0, 0, 0)):
+    def display(self, c=color(0, 0, 0), sk:py5.Sketch=None):
         for pendulum in self.pendulums:
-            pendulum.display(c)
+            pendulum.display(c, sk)
 
     def display_path(self, c1=color(255, 0, 0), c2=(0, 0, 255), pg=None):
         self.pendulums[-1].display_path(c1, c2, pg)
