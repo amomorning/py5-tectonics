@@ -1,10 +1,12 @@
 from py5 import *
 from utils import gradient_line
 from random import randint
+import sys
 
 def settings():
     size(800, 800)
-    pixel_density(2) # This is for retina displays in Macs
+    if sys.platform == 'darwin':
+        pixel_density(2)
 
 
 def setup():

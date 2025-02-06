@@ -1,6 +1,7 @@
 from py5 import *
 from utils import draw_shape
 import py5
+import sys
 
 
 class SimplePendulum:
@@ -81,7 +82,8 @@ class CompoundPendulum:
 
 def settings():
     size(800, 800, P2D)
-    pixel_density(2)
+    if sys.platform == 'darwin':
+        pixel_density(2)
 
 
 def setup():
