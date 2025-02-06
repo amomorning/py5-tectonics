@@ -1,5 +1,4 @@
 from py5 import *
-from utils import draw_shape
 import py5
 import sys
 
@@ -34,7 +33,8 @@ class SimplePendulum:
         sk.ellipse(x2, y2, 10, 10)
         sk.ellipse(self.x, self.y, 10, 10)
 
-    def display_path(self, c1, c2, pg=None):
+
+    def display_path(self, c1, c2, sk:py5.Sketch=None):
         x1 = self.prev[0] + self.r * sin(self.prev[2])
         y1 = self.prev[1] + self.r * cos(self.prev[2])
         x2 = self.x + self.r * sin(self.angle)
@@ -44,8 +44,11 @@ class SimplePendulum:
         ys = [self.prev[1], self.y, y2, y1]
         cs = [c1, c1, c2, c2]
 
-        draw_shape(xs, ys, cs, pg)
-
+        sk.begin_shape()
+        for x, y, c in zip(xs, ys, cs):
+            sk.fill(c)
+            sk.vertex(x, y)
+        sk.end_shape(CLOSE)
 
     def get_end(self):
         x2 = self.x + self.r * sin(self.angle)
@@ -73,8 +76,8 @@ class CompoundPendulum:
         for pendulum in self.pendulums:
             pendulum.display(c, sk)
 
-    def display_path(self, c1=color(255, 0, 0), c2=(0, 0, 255), pg=None):
-        self.pendulums[-1].display_path(c1, c2, pg)
+    def display_path(self, c1=color(255, 0, 0), c2=(0, 0, 255), sk:py5.Sketch=None):
+        self.pendulums[-1].display_path(c1, c2, sk)
 
     def get_end(self):
         return self.pendulums[-1].get_end()
@@ -90,15 +93,13 @@ def setup():
     global pg
     background(0)
     pg = create_graphics(800, 800, P2D)
-    pg.begin_draw()
-    pg.shader(load_shader('shader/vertex_color.glsl'))
-    pg.end_draw()
 
 
 def draw():
     global pendulum, pg, running
     if running:
         pg.begin_draw()
+        pg.no_stroke()
         pendulum.display_path(color(43, 66, 146), color(133, 142, 159), pg)
         pg.end_draw()
         background(0)
@@ -112,6 +113,8 @@ def key_pressed():
     global running
     if py5.key == '1':
         running = not running
+    else:
+        print_line_profiler_stats()
 
 
 if __name__ == '__main__':
@@ -121,4 +124,5 @@ if __name__ == '__main__':
                                 [0.17, -0.07, 0.05], # [-0.06, 0.04, 0.19]
                                 [0, 0, 0])
     pg: Py5Graphics = None
+    profile_draw()
     run_sketch()

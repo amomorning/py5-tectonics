@@ -1,21 +1,34 @@
 from py5 import *
-from utils import gradient_line
 from random import randint
 import sys
 
 def settings():
-    size(800, 800)
+    size(800, 800, P2D) # P2D is needed for gradient
     if sys.platform == 'darwin':
         pixel_density(2)
 
+def random_color():
+    return color(randint(0, 255), randint(0, 255), randint(0, 255))
 
 def setup():
     background(255)
-    for i in range(200):
-        x1, y1 = randint(0, 800), randint(0, 800)
-        x2, y2 = randint(0, 800), randint(0, 800)
-        gradient_line(x1, y1, x2, y2, color(255, 0, 0), color(0, 0, 255), 20, 8)
 
+def draw():
+    background(255)
+    stroke_weight(4)
+    N = 20
+    for _ in range(N):
+        begin_shape(LINES)
+        for i in range(2):
+            x, y = randint(0, 800), randint(0, 800)
+            stroke(random_color())
+            vertex(x, y)
+        end_shape()
+
+
+def key_pressed():
+    print_line_profiler_stats()
 
 if __name__ == '__main__':
+    profile_draw()
     run_sketch()
