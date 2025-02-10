@@ -2,6 +2,6 @@
 
 ## Pendulum
 
-Video is loading ...
+[Code](https://github.com/amomorning/py5-tectonics/blob/main/pendulum.py)
 
-https://github.com/user-attachments/assets/08f76348-2746-45c0-aa2c-a0c3600d304f
+![Result](imgs/pendulum.gif)
