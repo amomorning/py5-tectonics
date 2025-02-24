@@ -6,6 +6,14 @@ import numpy as np
 from shapely.ops import unary_union, polygonize
 
 
+def draw_light():
+    lights()
+    ambient_light(100, 100, 100)
+    point_light(255, 255, 255, 200, 200, 200)
+    directional_light(255, 255, 255, 1, -1, 1)
+    spot_light(255, 255, 255, 0, 0, 0, 0, -1, 1, 45, 2)
+
+
 def draw_axis():
     stroke(255, 0, 0)
     line(0, 0, 800, 0)
@@ -104,12 +112,16 @@ def draw():
     global site, rot_x, rot_z
 
     background(255)
+    draw_light()
+
     py5.push_matrix()
     py5.translate(py5.width/2, py5.height/2)
+
     py5.rotate_x(rot_x)
     py5.rotate_z(rot_z)
-    draw_polygon(site)
+
     draw_axis()
+    draw_polygon(site)
 
     for cutter in cutters:
         draw_linestring(cutter)
@@ -123,7 +135,6 @@ def draw():
 def mouse_moved():
     global rot_x, rot_z
     rot_x = remap(py5.mouse_y, 0, py5.height, 0, PI/2)
-    # rot_z = remap(py5.mouse_x, -py5.height, 0, -TWO_PI, 0)
     rot_z = remap(py5.mouse_x, 0, py5.width, -PI, PI)
 
 
