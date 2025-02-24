@@ -1,5 +1,6 @@
 import trimesh
 import py5
+import sys
 from py5 import *
 import numpy as np
 from shapely.affinity import scale, translate
@@ -58,18 +59,14 @@ def settings():
         pixel_density(2)
 
 
-
-def setup():
-    background(240)
+ply, rect = None, None
+def update_ply():
+    global ply
     ply = trimesh.path.polygons.random_polygon(5)
-    # pts = [
-    #     (3, 2), (4.5, 2), (2, 4.5), (2, 3),
-    #     (-2, 3), (-2, 4.5), (-4.5, 2), (-3, 2),
-    #     (-3, -2), (-4.5, -2), (-2, -4.5), (-2, -3),
-    #     (2, -3), (2, -4.5), (4.5, -2), (3, -2)
-    # ] # Ho'olheyak Polygon
-    # ply = Polygon(pts)
     ply = transform_polygon(ply, 400)
+
+def update_rect():
+    global ply, rect
 
     problem = MaxRectangleProblem(ply)
     algorithm = NSGA2(
@@ -86,15 +83,57 @@ def setup():
                    termination,
                    verbose=False)
 
-    rect = get_rectangle_polygon(*res.opt.get("X")[0])
+    if res.opt is not None:
+        rect = get_rectangle_polygon(*res.opt.get("X")[0])
 
-    stroke_weight(2)
 
-    stroke(0)
-    draw_polygon(ply)
 
-    stroke(255, 0, 0)
-    draw_polygon(rect)
 
+def setup():
+    background(240)
+    global ply, rect
+
+    update_ply()
+    update_rect()
+
+
+def draw():
+    background(240)
+    global ply, rect
+    if ply is not None:
+        stroke_weight(2)
+        stroke(0)
+        draw_polygon(ply)
+
+
+    if rect is not None:
+        stroke(255, 0, 0)
+        draw_polygon(rect)
+
+        fill(0)
+        stroke(0)
+        text(f'rect area {rect.area}', 2, 10)
+        fill(255)
+
+def mouse_pressed():
+    global ply, rect
+    if py5.mouse_button == LEFT:
+        update_ply()
+        rect = None
+    if py5.mouse_button == RIGHT:
+        update_rect()
+
+def key_pressed():
+    global ply, rect
+    if py5.key == '1':
+        pts = [
+            (3, 2), (4.5, 2), (2, 4.5), (2, 3),
+            (-2, 3), (-2, 4.5), (-4.5, 2), (-3, 2),
+            (-3, -2), (-4.5, -2), (-2, -4.5), (-2, -3),
+            (2, -3), (2, -4.5), (4.5, -2), (3, -2)
+        ] # Ho'olheyak Polygon
+        ply = Polygon(pts)
+        ply = transform_polygon(ply, 400)
+        rect = None
 
 run_sketch()
