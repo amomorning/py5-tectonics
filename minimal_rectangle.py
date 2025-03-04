@@ -13,7 +13,8 @@ from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
 from pymoo.termination import get_termination
-
+from pymoo.termination.ftol import MultiObjectiveSpaceTermination
+from pymoo.termination.robust import RobustTermination
 
 class MaxRectangleProblem(ElementwiseProblem):
     def __init__(self, polygon:Polygon):
@@ -77,11 +78,11 @@ def update_rect():
         mutation=PM(eta=20),
         eliminate_duplicates=True
     )
-    termination = get_termination("n_eval", 10000)
+    # termination = RobustTermination(
+        # MultiObjectiveSpaceTermination(tol=0.00005, n_skip=5), period=20)
     res = minimize(problem,
                    algorithm,
-                   termination,
-                   verbose=False)
+                   verbose=True)
 
     if res.opt is not None:
         rect = get_rectangle_polygon(*res.opt.get("X")[0])
