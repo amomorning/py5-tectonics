@@ -1,10 +1,7 @@
 import trimesh
-import py5
-import sys
 from py5 import *
-import numpy as np
-from shapely.affinity import scale, translate
 from shapely import Polygon
+from utils import *
 
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.operators.crossover.sbx import SBX
@@ -16,6 +13,7 @@ from pymoo.termination import get_termination
 from pymoo.termination.ftol import MultiObjectiveSpaceTermination
 from pymoo.termination.robust import RobustTermination
 
+
 class MaxRectangleProblem(ElementwiseProblem):
     def __init__(self, polygon:Polygon):
         bb = polygon.bounds
@@ -26,32 +24,9 @@ class MaxRectangleProblem(ElementwiseProblem):
         self.polygon = polygon
 
     def _evaluate(self, x, out, *args, **kwargs):
-        rect = get_rectangle_polygon(*x)
+        rect = get_rectangle_centroid(*x)
         out["F"] = -x[2] * x[3]
         out["G"] = -1.0 if self.polygon.contains(rect) else 1.0
-
-
-def get_rectangle_polygon(x, y, w, h, theta):
-    pts = np.array([
-        [x, y],
-        [x + w * np.cos(theta), y + w * np.sin(theta)],
-        [x + w * np.cos(theta) - h * np.sin(theta), y + w * np.sin(theta) + h * np.cos(theta)],
-        [x - h * np.sin(theta), y + h * np.cos(theta)],
-    ], dtype=np.float64)
-    return Polygon(pts)
-
-
-def draw_polygon(polygon:Polygon):
-    begin_shape()
-    for x, y in polygon.exterior.coords:
-        vertex(x, y)
-    end_shape(CLOSE)
-
-
-def transform_polygon(polygon:Polygon, s):
-    bb = polygon.bounds
-    sx, sy = bb[2]-bb[0], bb[3]-bb[1]
-    return translate(scale(polygon, s/sx, s/sy), s, s)
 
 
 def settings():
@@ -65,6 +40,7 @@ def update_ply():
     global ply
     ply = trimesh.path.polygons.random_polygon(5)
     ply = transform_polygon(ply, 400)
+
 
 def update_rect():
     global ply, rect
@@ -85,9 +61,7 @@ def update_rect():
                    verbose=True)
 
     if res.opt is not None:
-        rect = get_rectangle_polygon(*res.opt.get("X")[0])
-
-
+        rect = get_rectangle_centroid(*res.opt.get("X")[0])
 
 
 def setup():
