@@ -4,6 +4,7 @@ import numpy as np
 from collections import deque, defaultdict
 import time
 
+noise_scale = 0.25
 nx, ny = 30, 30
 x = np.linspace(0, 800, nx+1)
 y = np.linspace(0, 800, ny+1)
@@ -40,7 +41,7 @@ def init():
 
     for i in range(nx):
         for j in range(ny):
-            if noise(i, j) < 0.3:
+            if noise(i*noise_scale, j*noise_scale) < 0.5:
                 mask[i, j] = True
 
     for i in range(nx):
