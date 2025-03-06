@@ -48,7 +48,12 @@ def dijkstra(s):
 
 def init():
     global edges, G, mask
+    edges = []
+    G = defaultdict(list)
+
+    noise_seed(random_int(1000))
     mask = np.zeros((nx, ny), dtype=bool)
+
     py5.noise_detail(2)
     for i in range(nx):
         for j in range(ny):
@@ -62,6 +67,7 @@ def init():
                     if mask[i, j] or mask[i + dx, j + dy]:
                         continue
                     edges.append((index(i, j), index(i + dx, j + dy)))
+
 
     for u, v in edges:
         G[u].append(v)
@@ -113,5 +119,6 @@ def mouse_released():
 def key_pressed():
     if py5.key == '1':
         init()
+        update()
 
 run_sketch()
