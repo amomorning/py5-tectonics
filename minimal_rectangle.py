@@ -2,16 +2,13 @@ import trimesh
 from py5 import *
 from shapely import Polygon
 from utils import *
-
+import sys
 from pymoo.algorithms.moo.nsga2 import NSGA2
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
-from pymoo.termination import get_termination
-from pymoo.termination.ftol import MultiObjectiveSpaceTermination
-from pymoo.termination.robust import RobustTermination
 
 
 class MaxRectangleProblem(ElementwiseProblem):
@@ -24,7 +21,7 @@ class MaxRectangleProblem(ElementwiseProblem):
         self.polygon = polygon
 
     def _evaluate(self, x, out, *args, **kwargs):
-        rect = get_rectangle_centroid(*x)
+        rect = get_rectangle_bottom_left(*x)
         out["F"] = -x[2] * x[3]
         out["G"] = -1.0 if self.polygon.contains(rect) else 1.0
 
@@ -61,7 +58,7 @@ def update_rect():
                    verbose=True)
 
     if res.opt is not None:
-        rect = get_rectangle_centroid(*res.opt.get("X")[0])
+        rect = get_rectangle_bottom_left(*res.opt.get("X")[0])
 
 
 def setup():

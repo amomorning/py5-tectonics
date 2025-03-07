@@ -2,16 +2,27 @@ import py5
 import numpy as np
 import shapely
 import math, random
-
-from shapely.geometry.multipoint import MultiPoint
 from shapely.ops import polygonize, unary_union
 
-# list of pure functions
+# list of pure function
 
 def get_rectangle_centroid(x, y, w, h, theta):
-    pts = [[x, y], [x + w * np.cos(theta), y + w * np.sin(theta)],
-        [x + w * np.cos(theta) - h * np.sin(theta), y + w * np.sin(theta) + h * np.cos(theta)],
-        [x - h * np.sin(theta), y + h * np.cos(theta)]]
+    w, h = w/2, h/2
+    cs = np.cos(theta)
+    sn = np.sin(theta)
+    pts = [
+        [x - w * cs - h * sn, y - w * sn + h * cs],
+        [x + w * cs - h * sn, y + w * sn + h * cs],
+        [x + w * cs + h * sn, y + w * sn - h * cs],
+        [x - w * cs + h * sn, y - w * sn - h * cs]
+    ]
+    return shapely.Polygon(pts)
+
+def get_rectangle_bottom_left(x, y, w, h, theta):
+    cs = np.cos(theta)
+    sn = np.sin(theta)
+    pts = [[x, y], [x + w * cs, y + w * sn],
+           [x + w * cs - h * sn, y + w * sn + h * cs], [x - h * sn, y + h * cs]]
     return shapely.Polygon(pts)
 
 def rect_to_polygon(x, y, w, h):
