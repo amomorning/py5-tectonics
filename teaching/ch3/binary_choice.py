@@ -4,10 +4,11 @@ from pymoo.core.mixed import MixedVariableGA
 from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
 from pymoo.optimize import minimize
 from pymoo.visualization.scatter import Scatter
+from pymoo.visualization.pcp import PCP
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
-
+import random
 
 class BinaryChoice(ElementwiseProblem):
     def __init__(self, edges, num):
@@ -40,7 +41,7 @@ class BinaryChoice(ElementwiseProblem):
 N = 8
 vertex = np.random.random((N, 2)) * 10
 complete_graph = [(i, j, np.linalg.norm(vertex[i]-vertex[j])) for i in range(N) for j in range(i)]
-
+print(f'Generate a complete graph with {len(complete_graph)} edges.')
 print(f'Optimize a problem with {2**len(complete_graph)} status.')
 problem = BinaryChoice(complete_graph, N)
 algorithm = MixedVariableGA(pop_size=100, survival=RankAndCrowdingSurvival())
@@ -76,7 +77,16 @@ def plot():
 
 plot()
 
-pareto = Scatter()
-pareto.add(problem.pareto_front(), plot_type="line", color="black", alpha=0.7)
-pareto.add(res.F, facecolor="none", edgecolor="red")
+pareto = Scatter(angle=(20, 20))
+pareto.add(res.F, plot_type="line", color="c", alpha=0.6)
+pareto.add(res.F, facecolor="white", edgecolor="red")
 pareto.show()
+
+pcp = PCP(n_ticks=10,
+           legend=(True, {'loc': "upper left"}),
+          labels=["ave dist", "edge num", "total length"])
+pcp.set_axis_style(color="k", alpha=0.7)
+pcp.add(res.F, color="grey", alpha=0.5)
+idx = random.randint(0, len(res.F) - 1)
+pcp.add(res.F[idx], linewidth=5, color="red", label=f"Solution {idx}")
+pcp.show()
