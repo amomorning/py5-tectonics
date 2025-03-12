@@ -31,8 +31,8 @@ class BinaryChoice(ElementwiseProblem):
                     tot += nx.shortest_path_length(graph, i, j)
 
             out["F"] = [
-                tot/(self.num*self.num),
                 len(tmp_edges),
+                tot/(self.num*self.num),
                 sum([x[i] * self.edges[i][2] for i in range(len(self.edges))])
             ]
             out["G"] = -1
