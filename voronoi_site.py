@@ -2,7 +2,9 @@ import py5, sys
 from py5 import *
 
 from shapely.ops import voronoi_diagram
+from shapely import MultiPoint
 from utils import *
+
 
 site = None
 pts = None

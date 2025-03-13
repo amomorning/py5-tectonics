@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import random
 
+
 class BinaryChoice(ElementwiseProblem):
     def __init__(self, edges, num):
         vs = {i:Binary() for i in range(len(edges))}
@@ -48,6 +49,7 @@ algorithm = MixedVariableGA(pop_size=100, survival=RankAndCrowdingSurvival())
 
 res = minimize(problem,
                algorithm,
+               history=True,
                verbose=False)
 
 
