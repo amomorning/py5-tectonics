@@ -171,4 +171,4 @@ cython_debug/
 .pypirc
 
 .DS_Store
-/teaching/ch3/cache/
+**/cache/
