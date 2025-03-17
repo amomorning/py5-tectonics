@@ -1,6 +1,7 @@
 import momepy
 import geopandas
 from libpysal import graph
+import random
 import matplotlib.pyplot as plt
 import osmnx as ox
 
@@ -32,13 +33,20 @@ buildings = get_buildings(center, radius)
 streets = get_street_network(center, radius)
 convex_hull = streets.union_all().convex_hull
 
+profile = momepy.street_profile(streets, buildings)
+print(profile.head(5))
 
-tessellation = momepy.morphological_tessellation(buildings)
+
+# enclosures = momepy.enclosures(streets, limit=convex_hull)
 enclosures = momepy.enclosures(streets)
+print(enclosures.head(5))
+tessellation = momepy.enclosed_tessellation(buildings, enclosures)
 
-# ax = blocks.plot()
+
 ax = enclosures.plot(figsize=(10, 10), color=gray)
-buildings.plot(ax=ax, color='white', edgecolor=gray)
+tessellation.boundary.plot(ax=ax, color='black', )
+
+buildings.plot(ax=ax, color='white')
 streets.plot(ax=ax, color='black')
 ax.set_axis_off()
 plt.show()

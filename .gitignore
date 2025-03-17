@@ -172,3 +172,4 @@ cython_debug/
 
 .DS_Store
 **/cache/
+**/private_token.py
