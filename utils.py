@@ -28,6 +28,14 @@ def get_rectangle_bottom_left(x, y, w, h, theta):
 def rect_to_polygon(x, y, w, h):
     return shapely.Polygon([(x, y), (x+w, y), (x+w, y+h), (x, y+h)])
 
+def generate_regular_polygon(n, minR, maxR, x=0, y=0):
+    pts = []
+    for i in range(n):
+        r = random.uniform(minR, maxR)
+        theta = i*2*math.pi/n
+        pts.append((r*math.cos(theta) + x, r*math.sin(theta) + y))
+
+    return shapely.Polygon(pts)
 
 def transform_polygon(polygon:shapely.Polygon, s):
     bb = polygon.bounds

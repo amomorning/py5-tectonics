@@ -6,7 +6,7 @@ from shapely import MultiPoint
 from utils import *
 
 
-site = None
+site = generate_regular_polygon(6, 100, 400, 400, 400)
 pts = None
 polygons = None
 cnt = 5
@@ -31,7 +31,7 @@ def llyod(pts, site):
 
 def update():
     global site, pts, polygons
-    site = rect_to_polygon(100, 100, 600, 600)
+
     pts = MultiPoint(generate_points_in_polygon(site.buffer(-100), cnt))
     pts, polygons = llyod(pts, site)
 
@@ -58,8 +58,9 @@ def mouse_released():
         cnt += 1
         update()
     if py5.mouse_button == RIGHT:
-        cnt -= 1
+        site = generate_regular_polygon(6, 100, 400, 400, 400)
         update()
+
 
 update()
 run_sketch()
