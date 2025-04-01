@@ -89,3 +89,45 @@ def generate_cutters(pts, angles):
                                    (x + math.cos(angle) * d, y + math.sin(angle) * d)]))
     return cutters
 
+def extend_segment(p1, p2, d=0.01):
+    x1, y1 = p1
+    x2, y2 = p2
+    dx, dy = x2 - x1, y2 - y1
+    return (x1 - d * dx, y1 - d * dy), (x2 + d * dx, y2 + d * dy)
+
+def buildings_from_polygon(polygon, n=None, d=5, depth=20):
+    inner = polygon.buffer(-d-depth)
+    outer = polygon.buffer(-d/2)
+
+    if n is None:
+        n = len(outer.exterior.coords)
+    points = points_on_linearring(inner.exterior, n)
+
+    ls = []
+    for p in points:
+        perp_point = shapely.ops.nearest_points(outer.exterior, shapely.Point(p))[0]
+        perp_point = (perp_point.x, perp_point.y)
+        p1, p2 = extend_segment(p, perp_point)
+        ls.append(shapely.LineString([p1, p2]))
+    ls = unary_union(ls + [outer.exterior, inner.exterior])
+
+    results = polygonize(ls)
+    buildings = []
+    for b in results:
+        if type(b) is shapely.Polygon:
+            b = b.buffer(-d/2, join_style=2)
+            if inner.contains(b):
+                continue
+            buildings.append(b)
+    return buildings
+
+
+def points_on_linearring(linearring, n):
+    pts = []
+    delta = 1-(n-1)/n
+    rnd = random.random() * delta
+    for i in range(n):
+        x, y = linearring.interpolate(i/n + rnd, normalized=True).xy
+        pts.append((x[0], y[0]))
+    return pts
+
