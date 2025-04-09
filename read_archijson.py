@@ -1,14 +1,12 @@
 import archijson.geometry as ag
 import json, py5, trimesh, sys
 from shapely import LinearRing, LineString, Polygon
-from py5 import *
-
 
 
 def draw_light():
-    lights()
-    ambient_light(100, 100, 100)
-    point_light(200, 200, 200, 200, 200, 200)
+    py5.lights()
+    py5.ambient_light(100, 100, 100)
+    py5.point_light(200, 200, 200, 200, 200, 200)
 
 
 def coords_to_points(coords, size):
@@ -19,15 +17,17 @@ def coords_to_points(coords, size):
         pts.append(pt)
     return pts
 
-def segments_to_shapely(segments:ag.Segments, polygon=False):
-    pts = coords_to_points(segments.coordinates, segments.size)
+
+def segments_to_shapely(seg:ag.Segments, polygon=False):
+    pts = coords_to_points(seg.coordinates, seg.size)
 
     if polygon:
         return Polygon(pts)
-    if segments.closed:
+    if seg.closed:
         return LinearRing(pts)
     else:
         return LineString(pts)
+
 
 def segments_to_trimesh(e):
     seg = ag.call['Segments'](**e)
@@ -74,9 +74,9 @@ meshes = []
 shapes = []
 
 def settings():
-    size(1000, 1000, P3D)
+    py5.size(1000, 1000, py5.P3D)
     if sys.platform == 'darwin':
-        pixel_density(2)
+        py5.pixel_density(2)
 
 
 def setup():
@@ -98,15 +98,15 @@ def setup():
             continue
 
     for mesh in meshes:
-        shapes.append(convert_shape(mesh))
+        shapes.append(py5.convert_shape(mesh))
 
     for seg in segments:
-        shapes.append(convert_shape(seg))
+        shapes.append(py5.convert_shape(seg))
 
 
 def draw():
     global rot_x, rot_z
-    background(255)
+    py5.background(255)
     draw_light()
 
     py5.push_matrix()
@@ -116,15 +116,15 @@ def draw():
     py5.rotate_z(rot_z)
 
     for shp in shapes:
-        shape(shp)
+        py5.shape(shp)
 
     py5.pop_matrix()
 
 
 def mouse_moved():
     global rot_x, rot_z
-    rot_x = remap(py5.mouse_y, 0, py5.height, 0, PI/2)
-    rot_z = remap(py5.mouse_x, 0, py5.width, -PI, PI)
+    rot_x = py5.remap(py5.mouse_y, 0, py5.height, 0, py5.PI/2)
+    rot_z = py5.remap(py5.mouse_x, 0, py5.width, -py5.PI, py5.PI)
 
 
 def key_pressed():
@@ -134,4 +134,4 @@ def key_pressed():
         print('Scene saved!')
 
 
-run_sketch()
+py5.run_sketch()
