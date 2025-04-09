@@ -51,7 +51,7 @@ def prism_to_trimesh(e):
 
 def mesh_to_trimesh(e):
     vs = ag.Vertices(**e['vertices'])
-    fs = ag.Faces(e['faces']['count'], e['faces']['size'], e['faces']['index'])
+    fs = ag.Faces(**e['faces'])
 
     pts = coords_to_points(vs.coordinates, vs.size)
 
