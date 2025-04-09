@@ -1,8 +1,7 @@
 import archijson.geometry as ag
-from shapely import LinearRing, LineString
-import json
+import json, py5, trimesh, sys
+from shapely import LinearRing, LineString, Polygon
 from py5 import *
-import py5
 
 
 
@@ -12,73 +11,98 @@ def draw_light():
     point_light(200, 200, 200, 200, 200, 200)
 
 
-def draw_polygon_volume(polygon:LinearRing, h, z=0):
-    stroke(0)
-
-    begin_shape()
-    for x, y, _ in polygon.coords:
-        vertex(x, y, h+z)
-    end_shape(CLOSE)
-
-    for p0, p1 in zip(polygon.coords, polygon.coords[1:]):
-        begin_shape()
-        vertex(p0[0], p0[1], z)
-        vertex(p1[0], p1[1], z)
-        vertex(p1[0], p1[1], z + h)
-        vertex(p0[0], p0[1], z + h)
-        end_shape(CLOSE)
-
-def draw_linestring(polyline: LineString):
-    stroke(0)
-    begin_shape(LINES)
-    for x, y, z in polyline.coords:
-        vertex(x, y, z)
-    end_shape()
-
-def segments_to_shapely(segments:ag.Segments):
+def coords_to_points(coords, size):
     pts = []
-    n = len(segments.coordinates)
-    for i in range(n//segments.size):
-        pt = segments.coordinates[i*segments.size:(i+1)*segments.size]
+    n = len(coords)
+    for i in range(n//size):
+        pt = coords[i*size:(i+1)*size]
         pts.append(pt)
+    return pts
+
+def segments_to_shapely(segments:ag.Segments, polygon=False):
+    pts = coords_to_points(segments.coordinates, segments.size)
+
+    if polygon:
+        return Polygon(pts)
     if segments.closed:
         return LinearRing(pts)
     else:
         return LineString(pts)
 
-def prism_to_extrude_polygon(e):
+def segments_to_trimesh(e):
+    seg = ag.call['Segments'](**e)
+    pts = coords_to_points(seg.coordinates, seg.size)
+    if seg.size == 3:
+        pts = [(x, y) for x, y, z in pts]
+    return trimesh.creation.extrude_polygon(Polygon(pts), height=0.1)
+
+
+def prism_to_trimesh(e):
     seg = ag.call['Segments'](**e['segments'])
-    z = e['position']['z']
+    pts = coords_to_points(seg.coordinates, seg.size)
+    if seg.size == 3:
+        pts = [(x, y) for x, y, z in pts]
     h = e['height']
-    p = e['properties']
-    print(p)
-    return segments_to_shapely(seg), h, z, p
+    mesh = trimesh.creation.extrude_polygon(Polygon(pts), height=h)
+    if e['position']['z']:
+        mesh.apply_translation((0, 0, e['position']['z']))
+    return mesh
+
+
+def mesh_to_trimesh(e):
+    vs = ag.Vertices(**e['vertices'])
+    fs = ag.Faces(e['faces']['count'], e['faces']['size'], e['faces']['index'])
+
+    pts = coords_to_points(vs.coordinates, vs.size)
+
+    faces = []
+    cur = 0
+    for cnt, sz in zip(fs.count, fs.size):
+        for i in range(cnt):
+            if sz == 3:
+                faces.append(fs.index[cur:cur+sz])
+                cur += sz
+            else:
+                print('mesh not triangulate yet, skipping')
+    return trimesh.Trimesh(pts, faces)
+
 
 
 rot_x, rot_z = 0, 0
 segments = []
-volumes = []
-
+meshes = []
+shapes = []
 
 def settings():
     size(1000, 1000, P3D)
-    pixel_density(2)
+    if sys.platform == 'darwin':
+        pixel_density(2)
+
 
 def setup():
-    global segments, volumes
-    data = json.load(open("data/seu.archijson"))
+    global segments, shapes, meshes
+    data = json.load(open("data/any-place-output.archijson", 'r', encoding='utf-8'))
 
     for e in data['geometryElements']:
         if e['type'] == 'Segments':
             seg = ag.call['Segments'](**e)
-            geom = segments_to_shapely(seg)
-            segments.append(geom)
-
+            # if seg.filled:
+            #     meshes.append(segments_to_trimesh(e)) # need for export in flexurban
+            segments.append(segments_to_shapely(seg))
         elif e['type'] == 'Prism':
-            volumes.append(prism_to_extrude_polygon(e))
+            meshes.append(prism_to_trimesh(e))
+        elif e['type'] == 'Mesh':
+            meshes.append(mesh_to_trimesh(e))
         else:
             print(e['type'])
             continue
+
+    for mesh in meshes:
+        shapes.append(convert_shape(mesh))
+
+    for seg in segments:
+        shapes.append(convert_shape(seg))
+
 
 def draw():
     global rot_x, rot_z
@@ -91,28 +115,23 @@ def draw():
     py5.rotate_x(rot_x)
     py5.rotate_z(rot_z)
 
-    for seg in segments:
-        draw_linestring(seg)
-
-    for v, h, z, p in volumes:
-        fill(200)
-        if p['type'] == 'block':
-            fill(100)
-            draw_polygon_volume(v, h, z)
-        elif p['color']:
-            # p['color'] is 10040098
-            # c = int(p['color'], 16)
-            c = hex(p['color'])
-            r, g, b = int(c[2:4], 16), int(c[4:6], 16), int(c[6:8], 16)
-            fill(r, g, b)
-            draw_polygon_volume(v, h, z)
-        else:
-            draw_polygon_volume(v, h, z)
+    for shp in shapes:
+        shape(shp)
 
     py5.pop_matrix()
+
 
 def mouse_moved():
     global rot_x, rot_z
     rot_x = remap(py5.mouse_y, 0, py5.height, 0, PI/2)
     rot_z = remap(py5.mouse_x, 0, py5.width, -PI, PI)
+
+
+def key_pressed():
+    if py5.key == 's': # save
+        scene = trimesh.Scene(meshes)
+        scene.export('data/output.obj')
+        print('Scene saved!')
+
+
 run_sketch()
