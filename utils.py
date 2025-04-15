@@ -1,7 +1,7 @@
 import py5
+import math, random
 import numpy as np
 import shapely
-import math, random
 from shapely.ops import polygonize, unary_union
 
 # list of pure function
@@ -89,13 +89,25 @@ def generate_cutters(pts, angles):
                                    (x + math.cos(angle) * d, y + math.sin(angle) * d)]))
     return cutters
 
+
 def extend_segment(p1, p2, d=0.01):
     x1, y1 = p1
     x2, y2 = p2
     dx, dy = x2 - x1, y2 - y1
     return (x1 - d * dx, y1 - d * dy), (x2 + d * dx, y2 + d * dy)
 
-def buildings_from_polygon(polygon, n=None, d=5, depth=20):
+
+def points_on_linearring(linearring, n):
+    pts = []
+    delta = 1-(n-1)/n
+    rnd = random.random() * delta
+    for i in range(n):
+        x, y = linearring.interpolate(i/n + rnd, normalized=True).xy
+        pts.append((x[0], y[0]))
+    return pts
+
+
+def buildings_from_polygon(polygon, n=None, d=5, depth=18):
     inner = polygon.buffer(-d-depth)
     outer = polygon.buffer(-d/2)
 
@@ -121,13 +133,4 @@ def buildings_from_polygon(polygon, n=None, d=5, depth=20):
             buildings.append(b)
     return buildings
 
-
-def points_on_linearring(linearring, n):
-    pts = []
-    delta = 1-(n-1)/n
-    rnd = random.random() * delta
-    for i in range(n):
-        x, y = linearring.interpolate(i/n + rnd, normalized=True).xy
-        pts.append((x[0], y[0]))
-    return pts
 
