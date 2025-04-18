@@ -81,7 +81,7 @@ def settings():
 
 def setup():
     global segments, shapes, meshes
-    data = json.load(open("data/any-place-output.archijson", 'r', encoding='utf-8'))
+    data = json.load(open("data/flexurban_export.archijson", 'r', encoding='utf-8'))
 
     for e in data['geometryElements']:
         if e['type'] == 'Segments':
