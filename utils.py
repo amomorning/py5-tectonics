@@ -40,7 +40,10 @@ def generate_regular_polygon(n, minR, maxR, x=0, y=0):
 def transform_polygon(polygon:shapely.Polygon, s):
     bb = polygon.bounds
     sx, sy = bb[2]-bb[0], bb[3]-bb[1]
-    return shapely.affinity.translate(shapely.affinity.scale(polygon, s/sx, s/sy), s, s)
+    sx, sy = s*2/sx, s*2/sy
+    pos = s
+    s = min(sx, sy)
+    return shapely.affinity.translate(shapely.affinity.scale(polygon, s, s), pos, pos)
 
 def draw_points(pts):
     if isinstance(pts, shapely.MultiPoint):
